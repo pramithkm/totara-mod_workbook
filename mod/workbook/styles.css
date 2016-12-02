@@ -1,0 +1,140 @@
+.config-mod-workbook-page-heading,
+.mod-workbook-page-heading {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.2em;
+}
+
+.mod-workbook-page-heading {
+    padding-left: 0.8em;
+}
+
+
+.mod-workbook-page-addbtn {
+    float: right;
+    margin: 0.2em
+}
+
+#config-mod-workbook-pages {
+    padding-bottom: 2em;
+}
+
+.config-mod-workbook-page {
+    border: 1px solid gray;
+    border-radius: 0.3em;
+    margin: 0.3em;
+    padding: 0.3em;
+}
+
+.config-mod-workbook-page-item {
+    border: 1px solid lightgrey;
+    border-radius: 0.3em;
+    margin: 0.3em;
+    padding: 0.3em;
+}
+
+.workbook-nav-pages {
+    color: #087BB1;
+}
+
+.workbook-nav-pages div:hover {
+    cursor: pointer;
+    cursor: hand;
+    color: #003d6e;
+}
+
+.workbook-nav-currentpage {
+    color: #003d6e;
+}
+
+.workbook-nav-subpage {
+    margin-left: 1em;
+}
+
+.mod-workbook-item {
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+    border-bottom: 1px solid lightgray;
+}
+
+.mod-workbook-item textarea {
+    width: 100%;
+    height: 5em;
+}
+
+.mod-workbook-item-sitrep {
+    border: 1px solid #c8d7e4;
+    padding: 0.3em;
+    width: 40%;
+    margin-left:auto;
+    border-radius: 0.3em;
+}
+
+.mod-workbook-submission-timemodified,
+.mod-workbook-submission-grade-details,
+.mod-workbook-submission-requiredgrade {
+    font-size: 0.7em;
+    font-style: italic;
+}
+
+.mod-workbook-submission-status,
+.mod-workbook-submission-grade
+ {
+    font-size: 0.9em;
+}
+
+.mod-workbook-label {
+    font-weight: bold;
+}
+
+.mod-workbook-page-navigation img:hover {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.mod-workbook-page-navigation .mod-workbook-nav-next {
+    float: right;
+}
+
+
+/**
+ * printing styles
+ */
+
+.mod-workbook-print .comment-area,
+.mod-workbook-print .mod-workbook-item-response .workbook-btnsubmit,
+.mod-workbook-print .mod-workbook-page-navigation {
+    display: none;
+}
+
+.mod-workbook-print .comment-ctrl {
+    display: block;
+}
+
+
+@media print {
+    @page {
+        margin: 25mm !important;
+    }
+
+    #block-region-side-pre,
+    #block-region-side-post,
+    #page-header,
+    #page-footer,
+    .logininfo,
+    .navbar,
+    #totaramenu {
+        display: none !important;
+    }
+
+    #region-main {
+        width: 100% !important;
+        padding: 0;
+    }
+
+    #mod-workbook-content .mod-workbook-user-page {
+        page-break-inside : avoid;
+    }
+}
+
