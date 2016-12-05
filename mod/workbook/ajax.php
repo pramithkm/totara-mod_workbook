@@ -56,7 +56,7 @@ try {
 
             $PAGE->requires->strings_for_js(array('confirmsubmit'), 'workbook');
             $content = $renderer->user_workbook_page($userworkbook, $pageid);
-            $content .= $PAGE->requires->get_end_code();  // Any javascript that might be required.
+            $content .= $PAGE->requires->get_end_code(false);  // Any javascript that might be required.
 
             $jsonparams = array(
                 'status' => 'success',

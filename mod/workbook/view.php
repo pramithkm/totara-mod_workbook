@@ -64,6 +64,8 @@ $event->add_record_snapshot('course', $PAGE->course);
 $event->add_record_snapshot($PAGE->cm->modname, $workbook);
 $event->trigger();
 
+$PAGE->set_url('/mod/workbook/view.php', array('id' => $cm->id, 'userid' => $userid));
+
 $renderer = $PAGE->get_renderer('workbook');
 $userworkbook = new \mod_workbook\user_workbook($workbook->id, $userid);
 if (empty($userworkbook->pages)) {
@@ -81,7 +83,6 @@ $regions = $PAGE->blocks->get_regions();
 $PAGE->blocks->add_fake_block($navblock, reset($regions));
 
 // Page header.
-$PAGE->set_url('/mod/workbook/view.php', array('id' => $cm->id, 'userid' => $userid));
 $PAGE->set_title(format_string($workbook->name));
 $PAGE->set_heading(format_string($course->fullname).' - '.format_string($workbook->name));
 

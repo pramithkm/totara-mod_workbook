@@ -139,7 +139,7 @@ class helper {
         foreach ($gradings as $grading) {
             $eventdata = new \stdClass();
             $eventdata->userto = $grading;
-            $eventdata->userfrom = $grading->gradedby;
+            $eventdata->userfrom = \totara_core\totara_user::get_user($grading->gradedby);
             $eventdata->icon = 'elearning-update';
             $eventdata->contexturl = new \moodle_url('/mod/workbook/view.php',
                 array(
