@@ -60,111 +60,6 @@ class helper {
     }
 
 
-    static function send_submission_notifications($since) {
-        global $DB;
-
-        // Send submission notifications to assessors.
-        $sql = "SELECT pis.id AS submissionid, u.*,
-                w.id AS workbookid,
-                w.name AS workbookname,
-                w.course AS courseid,
-                p.id AS pageid,
-                c.shortname AS courseshortname,
-                pi.itemtype
-            FROM {workbook} w
-            JOIN {workbook_page} p ON w.id = p.workbookid
-            JOIN {workbook_page_item} pi ON p.id = pi.pageid
-            JOIN {workbook_page_item_submit} pis ON pi.id = pis.pageitemid
-            JOIN {user} u ON pis.userid = u.id
-            JOIN {course} c ON w.course = c.id
-            WHERE pis.status = ? AND pis.timemodified >= ? AND pis.superseded = 0";
-        $submissions = $DB->get_records_sql($sql, array(WORKBOOK_STATUS_SUBMITTED, $since));
-
-        $sentcount = 0;
-        foreach ($submissions as $usersubmission) {
-            $assessors = self::get_assessors($usersubmission->workbookid, $usersubmission->courseid, $usersubmission->id);
-            foreach ($assessors as $assessor) {
-                $eventdata = new \stdClass();
-                $eventdata->userto = $assessor;
-                $eventdata->userfrom = $usersubmission;
-                $eventdata->icon = 'elearning-complete';
-                $eventdata->contexturl = new \moodle_url('/mod/workbook/view.php',
-                    array(
-                        'userid' => $usersubmission->id,
-                        'wid' => $usersubmission->workbookid,
-                        'pid' => $usersubmission->pageid
-                    )
-                );
-                $eventdata->contexturl = $eventdata->contexturl->out();
-                $strobj = new \stdClass();
-                $strobj->user = fullname($usersubmission);
-                $strobj->workbook = format_string($usersubmission->workbookname);
-                $strobj->courseshortname = format_string($usersubmission->courseshortname);
-                $strobj->itemtype = get_string('type'.$usersubmission->itemtype, 'workbook');
-                $eventdata->subject = get_string('msg:itemsubmissionsubject', 'workbook', $strobj);
-                $eventdata->fullmessage = get_string('msg:itemsubmission', 'workbook', $strobj);
-                // $eventdata->sendemail = TOTARA_MSG_EMAIL_NO;
-
-                tm_task_send($eventdata);
-                $sentcount++;
-            }
-        }
-
-        return $sentcount;
-    }
-
-
-    static function send_graded_notifications($since) {
-        global $DB;
-
-        // Send graded notifications to students.
-        $sql = "SELECT pis.id AS submissionid, u.*,
-                w.id AS workbookid,
-                w.name AS workbookname,
-                w.course AS courseid,
-                p.id AS pageid,
-                c.shortname AS courseshortname,
-                pis.gradedby,
-                pi.itemtype
-            FROM {workbook} w
-            JOIN {workbook_page} p ON w.id = p.workbookid
-            JOIN {workbook_page_item} pi ON p.id = pi.pageid
-            JOIN {workbook_page_item_submit} pis ON pi.id = pis.pageitemid
-            JOIN {user} u ON pis.userid = u.id
-            JOIN {course} c ON w.course = c.id
-            WHERE pis.status IN (?, ?) AND pis.timegraded >= ? AND pis.superseded = 0";
-        $gradings = $DB->get_records_sql($sql, array(WORKBOOK_STATUS_GRADED, WORKBOOK_STATUS_PASSED, $since));
-
-        $sentcount = 0;
-        foreach ($gradings as $grading) {
-            $eventdata = new \stdClass();
-            $eventdata->userto = $grading;
-            $eventdata->userfrom = \totara_core\totara_user::get_user($grading->gradedby);
-            $eventdata->icon = 'elearning-update';
-            $eventdata->contexturl = new \moodle_url('/mod/workbook/view.php',
-                array(
-                    'userid' => $grading->id,
-                    'wid' => $grading->workbookid,
-                    'pid' => $grading->pageid
-                )
-            );
-            $eventdata->contexturl = $eventdata->contexturl->out();
-            $strobj = new \stdClass();
-            $strobj->workbook = format_string($grading->workbookname);
-            $strobj->courseshortname = format_string($grading->courseshortname);
-            $strobj->itemtype = get_string('type'.$grading->itemtype, 'workbook');
-            $eventdata->subject = get_string('msg:itemgradedsubject', 'workbook', $strobj);
-            $eventdata->fullmessage = get_string('msg:itemgraded', 'workbook', $strobj);
-            // $eventdata->sendemail = TOTARA_MSG_EMAIL_NO;
-
-            tm_alert_send($eventdata);
-            $sentcount++;
-        }
-
-        return $sentcount;
-    }
-
-
     static function get_workbook_for_pageitem($pageitemid) {
         global $DB;
 
@@ -175,82 +70,6 @@ class helper {
             WHERE pi.id = ?";
 
         return $DB->get_record_sql($sql, array($pageitemid), MUST_EXIST);
-    }
-
-
-    static function send_comment_notifications($since) {
-        global $DB;
-
-        $commentarea = 'workbook_page_item_';
-
-        // Get all recent comments.
-        $sql = "SELECT *
-            FROM {comments} c
-            WHERE commentarea LIKE '{$commentarea}%' AND timecreated >= ?";
-        $comments = $DB->get_records_sql($sql, array($since));
-
-        $sentcount = 0;
-        foreach ($comments as $comment) {
-            $commentuser = \core_user::get_user($comment->userid);
-            $pageitemid = substr($comment->commentarea, strlen($commentarea));
-            $workbookuserid = $comment->itemid;
-            if (empty($pageitemid)) {
-                // Something's not right - skip this one.
-                continue;
-            }
-            $workbook = self::get_workbook_for_pageitem($pageitemid);
-
-            if ($workbookuserid == $comment->userid) {
-                // Workbook owner comment - send notification to other participants.
-                $sql = "SELECT *
-                    FROM {user}
-                    WHERE id IN (
-                        SELECT DISTINCT userid
-                        FROM {comments} c
-                        WHERE commentarea = ? AND itemid = ? AND userid != ?
-                    )";
-                $participants = $DB->get_records_sql($sql, array($comment->commentarea, $comment->userid, $comment->userid));
-                if (empty($participants)) {
-                    // No comment participants yet - send notification to assessors.
-                    $assessors = self::get_assessors($workbook->id, $workbook->course, $workbookuserid);
-                    foreach ($assessors as $assessor) {
-                        self::send_comment_notification($commentuser, $assessor, $workbook, $workbookuserid);
-                        $sentcount++;
-                    }
-                } else {
-                    foreach ($participants as $participant) {
-                        self::send_comment_notification($commentuser, $participant, $workbook, $workbookuserid);
-                        $sentcount++;
-                    }
-                }
-            } else {
-                // Send notification to workbook user.
-                $workbookuser = \core_user::get_user($comment->itemid);
-                self::send_comment_notification($commentuser, $workbookuser, $workbook, $workbookuserid);
-                $sentcount++;
-            }
-        }
-
-        return $sentcount;
-    }
-
-
-    static function send_comment_notification($userfrom, $userto, $workbook, $workbookuserid) {
-        $eventdata = new \stdClass();
-        $eventdata->userto = $userto;
-        $eventdata->userfrom = $userfrom;
-        $eventdata->icon = 'elearning-newcomment';
-        $eventdata->contexturl = new \moodle_url('/mod/workbook/view.php',
-            array('wid' => $workbook->id, 'userid' => $workbookuserid, 'pid' => $workbook->pageid));
-        $eventdata->contexturl = $eventdata->contexturl->out();
-        $strobj = new \stdClass();
-        $strobj->user = fullname($userfrom);
-        $strobj->workbook = format_string($workbook->name);
-        $eventdata->subject = get_string('msg:commentsubject', 'workbook', $strobj);
-        $eventdata->fullmessage = get_string('msg:comment', 'workbook', $strobj);
-        // $eventdata->sendemail = TOTARA_MSG_EMAIL_NO;
-
-        tm_alert_send($eventdata);
     }
 
 
@@ -269,9 +88,11 @@ class helper {
         return new $itemclass($workbookid, $item);
     }
 
+
     static function can_assess(\context_module $context, $workbookuserid) {
         return is_enrolled($context, $workbookuserid) && has_capability('mod/workbook:assess', $context);
     }
+
 
     static function can_submit(\context_module $context, $workbookuserid) {
         global $USER;

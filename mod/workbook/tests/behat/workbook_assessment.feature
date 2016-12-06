@@ -100,7 +100,7 @@ Feature: Workbook submission and assessment
     Then I should see "This the second question page item"
 
 
-  @javascript @wip
+  @javascript
   Scenario: Submit and assess workbook
     Given I log in as "admin"
     And I follow "Course 1"
@@ -197,14 +197,9 @@ Feature: Workbook submission and assessment
     Then I should see "Status: Submitted" in the ".mod-workbook-item-sitrep" "css_element"
     And I log out
 
-    # Log in as admin and trigger cron so the submission notifications go out
-    When I log in as "admin"
-    And I trigger cron
-    And I am on homepage
-    And I log out
-
     # Log in as teacher1 and assess
     When I log in as "teacher1"
+    And I run the scheduled task "\mod_workbook\task\send_submission_notifications"
 
     # Check notifications
     And I click on "My Learning" in the totara menu
@@ -242,16 +237,9 @@ Feature: Workbook submission and assessment
     Then ".mod-workbook-submission-grade input" "css_element" should not exist
     And I log out
 
-    # Log in as admin and trigger cron so the assessment notifications go out
-    # Wait to ensure cron can run again todo: turn this into a scheduled tasks which runs all the time, then remove this wait ;)
-    When I wait "60" seconds
-    When I log in as "admin"
-    And I trigger cron
-    And I am on homepage
-    And I log out
-
     # Finally, log in as student1 and check notification
     When I log in as "student1"
+    And I run the scheduled task "\mod_workbook\task\send_graded_notifications"
     # Check notifications
     And I click on "My Learning" in the totara menu
     Then I should see "Your Essay question submission has been assessed"
@@ -268,3 +256,4 @@ Feature: Workbook submission and assessment
     And I should see "Page item 3"
     And I log out
 
+    # todo: comment notifications?

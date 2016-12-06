@@ -298,28 +298,6 @@ function workbook_print_recent_mod_activity($activity, $courseid, $detail, $modn
 }
 
 /**
- * Function to be run periodically according to the moodle cron
- *
- * @return boolean
- */
-function workbook_cron () {
-    global $CFG, $DB;
-
-    $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'workbook'));
-
-    $sentcount = \mod_workbook\helper::send_submission_notifications($lastcron);
-    mtrace("{$sentcount} submission notifications sent");
-
-    $sentcount = \mod_workbook\helper::send_graded_notifications($lastcron);
-    mtrace("{$sentcount} graded notifications sent");
-
-    $sentcount = \mod_workbook\helper::send_comment_notifications($lastcron);
-    mtrace("{$sentcount} comment notifications sent");
-
-    return true;
-}
-
-/**
  * Returns all other caps used in the module
  *
  * For example, this could be array('moodle/site:accessallgroups') if the

@@ -30,9 +30,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_workbook';
-$plugin->version = 2016060901;
+$plugin->version = 2016120600;
 $plugin->release = 'v1.0';
-$plugin->requires = 2013111800;
+$plugin->requires = 2015051100;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->cron = 1;  // Run every time.
 $plugin->dependencies = array();
