@@ -23,6 +23,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 class rb_source_workbook_submission extends rb_base_source {
+    use \core_user\rb\source\report_trait;
+    use \core_course\rb\source\report_trait;
+    use \totara_job\rb\source\report_trait;
+    use \core_tag\rb\source\report_trait;
+    use \totara_cohort\rb\source\report_trait;
+
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
@@ -118,14 +124,14 @@ class rb_source_workbook_submission extends rb_base_source {
         );
 
         // include some standard joins
-        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'workbook', 'course');
+        $this->add_core_user_tables($joinlist, 'base', 'userid');
+        $this->add_core_course_tables($joinlist, 'workbook', 'course');
         // requires the course join
-        $this->add_course_category_table_to_joinlist($joinlist,
+        $this->add_core_course_category_tables($joinlist,
             'course', 'category');
-        $this->add_job_assignment_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_core_tag_tables_to_joinlist('core', 'course', $joinlist, 'course', 'id');
-        $this->add_cohort_course_tables_to_joinlist($joinlist, 'course', 'id');
+        $this->add_totara_job_tables($joinlist, 'base', 'userid');
+        $this->add_core_tag_tables('core', 'course', $joinlist, 'course', 'id');
+        $this->add_totara_cohort_course_tables($joinlist, 'course', 'id');
 
         return $joinlist;
     }
@@ -171,7 +177,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 'navtitle',
                 get_string('pagenavtitle', 'rb_source_workbook_submission'),
                 'workbook_page.navtitle',
-                array('joins' => 'workbook_page')
+                array('joins' => 'workbook_page', 'displayfunc' => 'workbook_page_link',)
             ),
             new rb_column_option(
                 'workbook_page_item',
@@ -185,7 +191,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 'name',
                 get_string('itemname', 'rb_source_workbook_submission'),
                 'workbook_page_item.name',
-                array('joins' => 'workbook_page_item')
+                array('joins' => 'workbook_page_item', 'displayfunc' => 'workbook_itemtype')
             ),
             new rb_column_option(
                 'workbook_page_item',
@@ -217,7 +223,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 'requiredgrade',
                 get_string('requiredgrade', 'rb_source_workbook_submission'),
                 'workbook_page_item.requiredgrade',
-                array('joins' => 'workbook_page_item')
+                array('joins' => 'workbook_page_item', 'displayfunc' => 'workbook_itemtype')
             ),
             new rb_column_option(
                 'base',
@@ -233,7 +239,8 @@ class rb_source_workbook_submission extends rb_base_source {
                 'base',
                 'grade',
                 get_string('grade', 'rb_source_workbook_submission'),
-                'base.grade'
+                'base.grade',
+                array('displayfunc' => 'workbook_itemtype')
             ),
             new rb_column_option(
                 'base',
@@ -325,12 +332,12 @@ class rb_source_workbook_submission extends rb_base_source {
         );
 
         // include some standard columns
-        $this->add_user_fields_to_columns($columnoptions);
-        $this->add_course_fields_to_columns($columnoptions);
-        $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_job_assignment_fields_to_columns($columnoptions);
-        $this->add_core_tag_fields_to_columns('core', 'course', $columnoptions);
-        $this->add_cohort_course_fields_to_columns($columnoptions);
+        $this->add_core_user_columns($columnoptions);
+        $this->add_core_course_columns($columnoptions);
+        $this->add_core_course_category_columns($columnoptions);
+        $this->add_totara_job_columns($columnoptions);
+        $this->add_core_tag_columns('core', 'course', $columnoptions);
+        $this->add_totara_cohort_course_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -401,12 +408,12 @@ class rb_source_workbook_submission extends rb_base_source {
         );
 
         // include some standard filters
-        $this->add_user_fields_to_filters($filteroptions);
-        $this->add_course_fields_to_filters($filteroptions);
-        $this->add_course_category_fields_to_filters($filteroptions);
-        $this->add_job_assignment_fields_to_filters($filteroptions);
-        $this->add_core_tag_fields_to_filters('core', 'course', $filteroptions);
-        $this->add_cohort_course_fields_to_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions);
+        $this->add_core_course_filters($filteroptions);
+        $this->add_core_course_category_filters($filteroptions);
+        $this->add_totara_job_filters($filteroptions);
+        $this->add_core_tag_filters('core', 'course', $filteroptions);
+        $this->add_totara_cohort_course_filters($filteroptions);
 
         return $filteroptions;
     }
