@@ -58,6 +58,8 @@ class rb_source_workbook_submission extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('workbooksubmission', 'rb_source_workbook_submission');
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->usedcomponents[] = 'mod_workbook';
+        $this->usedcomponents[] = 'totara_cohort';
 
         parent::__construct();
     }
@@ -263,7 +265,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 $DB->sql_concat_join("' '", $usednamefieldsmodify),
                 array(
                       'joins' => 'modifyuser',
-                      'displayfunc' => 'link_user',
+                      'displayfunc' => 'user_link',
                       'extrafields' => array_merge(array('id' => 'modifyuser.id'), $allnamefieldsmodify)
                 )
             ),
@@ -281,7 +283,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 $DB->sql_concat_join("' '", $usednamefieldsgrade),
                 array(
                       'joins' => 'gradeuser',
-                      'displayfunc' => 'link_user',
+                      'displayfunc' => 'user_link',
                       'extrafields' => array_merge(array('id' => 'gradeuser.id'), $allnamefieldsgrade)
                 )
             ),
@@ -549,92 +551,16 @@ class rb_source_workbook_submission extends rb_base_source {
     }
 
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
+/*
 
-    function rb_display_workbook_item_nameorcontent($itemname, $row, $isexport) {
-        if (!empty($itemname)) {
-            return $itemname;
-        }
-
-        return $this->rb_display_workbook_item_content($row->content, $row, $isexport);
-    }
-
-
-
-    function rb_display_workbook_item_content($content, $row, $isexport) {
-        if ($isexport) {
-            return $content;
-        }
-
-        return $content; // todo: use itemtype class here
-    }
-
-    function rb_display_workbook_item_response($response, $row, $isexport) {
-        if ($isexport) {
-            return $response;
-        }
-
-        return $response; // todo: user itemtype class here
-    }
 
     function rb_display_workbook_submission_status($status, $row, $isexport) {
             return get_string('status'.$status, 'workbook');
     }
 
-    function rb_display_workbook_itemtype($type, $row, $isexport) {
-        return get_string('type'.$type, 'workbook');
-    }
-
-    function rb_display_workbook_link($workbookname, $row, $isexport) {
-        return html_writer::link(new moodle_url('/mod/workbook/view.php',
-            array('userid' => $row->userid, 'wid' => $row->workbookid)), $workbookname);
-    }
-
-    function rb_display_workbook_page_link($title, $row, $isexport) {
-        return html_writer::link(new moodle_url('/mod/workbook/view.php',
-            array('userid' => $row->userid, 'wid' => $row->workbookid, 'pageid' => $row->pageid)), $title);
-    }
-
-    function rb_display_workbook_assess_link($workbookname, $row, $isexport) {
-        if (!in_array($row->status, array(WORKBOOK_STATUS_SUBMITTED, WORKBOOK_STATUS_GRADED))) {
-            return '';
-        }
-
-        return html_writer::link(new moodle_url('/mod/workbook/view.php',
-            array('userid' => $row->userid, 'wid' => $row->workbookid, 'pid' => $row->pageid)), get_string('assess', 'rb_source_workbook_submission'));
-    }
-
-    function rb_display_workbook_submission_superseded($superseded, $row, $isexport) {
-        return !empty($superseded) ? get_string('yes') : get_string('no');
-    }
-
-    function rb_display_workbook_submission_files($submissionid, $row, $isexport) {
-        if (empty($row->allowfileuploads)) {
-            return '';
-        }
-        $itemtypeclass = '\mod_workbook\itemtype\\'.$row->itemtype;
-        if (!$itemtypeclass::supports_file_uploads()) {
-            return '';
-        }
-
-        $item = new stdClass();
-        $item->pageid = $row->pageid;
-        $item->itemtype = $row->itemtype;
-        $item->name = $row->name;
-        $item->content = $row->content;
-        $item->requiredgrade = $row->requiredgrade;
-        $item->allowcomments = $row->allowcomments;
-        $item->allowfileuploads = $row->allowfileuploads;
-        $itemtype = \mod_workbook\helper::get_itemtype_instance($row->workbookid, $item);
-
-        return $itemtype->list_page_item_files($row->userid, $submissionid);
-    }
 
 
+*/
 
 
     //
