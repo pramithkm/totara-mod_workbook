@@ -44,7 +44,7 @@ class workbook_page_link extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
-        return html_writer::link(new moodle_url('/mod/workbook/view.php',
+        return \html_writer::link(new \moodle_url('/mod/workbook/view.php',
             array('userid' => $extrafields->userid, 'wid' => $extrafields->workbookid, 'pageid' => $extrafields->pageid)), $value);
     }
 

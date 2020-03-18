@@ -42,7 +42,10 @@ class workbook_itemtype extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return get_string('type'.$value, 'workbook');
+        if ($value) {
+            return get_string('type'.$value, 'mod_workbook');
+        }
+        return '';
     }
 
     /**

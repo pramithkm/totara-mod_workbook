@@ -79,7 +79,7 @@ if (empty($pageid)) {
 
 // Add quiz navigation block.
 $navblock = \mod_workbook\helper::get_navigation_block($userworkbook, $pageid, $renderer);
-$regions = $PAGE->blocks->get_regions();
+$region = $PAGE->blocks->get_default_region();
 $PAGE->blocks->add_fake_block($navblock, reset($regions));
 
 // Page header.
