@@ -220,7 +220,7 @@ class mod_workbook_renderer extends plugin_renderer_base {
         if (!empty($prevpage)) {
             $out .= html_writer::empty_tag('img',
                 array(
-                    'src' => $this->pix_url('t/left'),
+                    'src' => $this->image_url('t/left'),
                     'class' => 'iconsmall mod-workbook-nav-prev',
                     'alt' => 'previouspage',
                     'pageid' => $prevpage->id,
@@ -231,7 +231,7 @@ class mod_workbook_renderer extends plugin_renderer_base {
         if (!empty($nextpage)) {
             $out .= html_writer::empty_tag('img',
                 array(
-                    'src' => $this->pix_url('t/right'),
+                    'src' => $this->image_url('t/right'),
                     'class' => 'iconsmall mod-workbook-nav-next',
                     'alt' => 'nextpage',
                     'pageid' => $nextpage->id,
