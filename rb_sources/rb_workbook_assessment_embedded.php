@@ -24,6 +24,7 @@
 
 global $CFG;
 require_once($CFG->dirroot.'/totara/reportbuilder/classes/rb_base_content.php');
+require_once($CFG->dirroot.'/mod/workbook/rb_sources/rb_source_workbook_submission.php');
 require_once($CFG->dirroot.'/mod/workbook/lib.php');
 
 class rb_workbook_assessment_embedded extends rb_base_embedded {

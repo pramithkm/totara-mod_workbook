@@ -53,7 +53,11 @@ if (!(has_capability('mod/workbook:assess', $modcontext))) {
     print_error('accessdenied', 'workbook');
 }
 
-if (!$report = reportbuilder_get_embedded_report('workbook_assessment', array('workbookid' => $workbook->id), false, $sid)) {
+$config = new rb_config();
+$config->set_sid($sid)
+    ->set_embeddata(array('workbookid' => $workbook->id));
+
+if (!$report = reportbuilder::create_embedded('workbook_assessment', $config)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 

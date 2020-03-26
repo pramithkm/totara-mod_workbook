@@ -156,7 +156,11 @@ class rb_source_workbook_submission extends rb_base_source {
                 array(
                     'joins' => 'workbook',
                     'displayfunc' => 'workbook_link',
-                    'extrafields' => array('userid' => 'base.userid', 'workbookid' => 'workbook.id')
+                    'extrafields' => array(
+                        'userid' => 'base.userid',
+                        'workbookid' => 'workbook.id',
+                        'status' => 'base.status'
+                    )
                 )
             ),
             new rb_column_option(
@@ -179,7 +183,15 @@ class rb_source_workbook_submission extends rb_base_source {
                 'navtitle',
                 get_string('pagenavtitle', 'rb_source_workbook_submission'),
                 'workbook_page.navtitle',
-                array('joins' => 'workbook_page', 'displayfunc' => 'workbook_page_link',)
+                array(
+                    'joins' => 'workbook_page',
+                    'displayfunc' => 'workbook_page_link',
+                    'extrafields' => array(
+                        'userid' => 'base.userid',
+                        'workbookid' => 'workbook.id',
+                        'pageid' => 'workbook_page.id'
+                    )
+                )
             ),
             new rb_column_option(
                 'workbook_page_item',

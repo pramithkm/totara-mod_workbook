@@ -42,9 +42,13 @@ class workbook_assess_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        if (!in_array($row->status, array(WORKBOOK_STATUS_SUBMITTED, WORKBOOK_STATUS_GRADED))) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if (!in_array($extrafields->status, array(WORKBOOK_STATUS_SUBMITTED, WORKBOOK_STATUS_GRADED))) {
             return '';
         }
+        return \html_writer::link(new \moodle_url('/mod/workbook/view.php',
+        array('userid' => $extrafields->userid, 'wid' => $extrafields->workbookid, 'pid' => $extrafields->pageid)), get_string('assess', 'rb_source_workbook_submission'));
     }
 
     /**
