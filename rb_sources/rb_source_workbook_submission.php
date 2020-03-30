@@ -253,8 +253,7 @@ class rb_source_workbook_submission extends rb_base_source {
                 'base',
                 'grade',
                 get_string('grade', 'rb_source_workbook_submission'),
-                'base.grade',
-                array('displayfunc' => 'workbook_itemtype')
+                'base.grade'
             ),
             new rb_column_option(
                 'base',
